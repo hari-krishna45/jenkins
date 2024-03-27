@@ -1,0 +1,83 @@
+credentials:
+  system:
+    domainCredentials:
+    - credentials:
+      - aws:
+          accessKey: "${ACCESSKEY}"
+          id: "AWS"
+          scope: GLOBAL
+          secretKey: "${SECREYKEY}"
+      - basicSSHUserPrivateKey:
+          id: "sshkey"
+          privateKeySource:
+            directEntry:
+              privateKey: "${readFile:${PRIVATEKEYPATH}}"
+          scope: GLOBAL
+          username: "${SSHUSERNAME}"
+jenkins:
+  authorizationStrategy:
+    loggedInUsersCanDoAnything:
+      allowAnonymousRead: false
+  securityRealm:
+    local:
+      allowsSignup: false
+      users:
+        - id: "${JENKINS_USER}"
+          password: "${JENKINS_PASSWORD}"
+  clouds:
+  - amazonEC2:
+      credentialsId: "AWS"
+      name: "jenkins-slave"
+      region: "${REGION}"
+      sshKeysCredentialsId: "sshkey"
+      templates:
+      - ami: "${AMI}"
+        amiType:
+          unixData:
+            sshPort: "22"
+        associatePublicIp: ${associatePublicIp}
+        connectBySSHProcess: true
+        connectionStrategy: PRIVATE_IP
+        deleteRootOnTermination: false
+        description: "jenkins-slave"
+        ebsEncryptRootVolume: DEFAULT
+        ebsOptimized: false
+        hostKeyVerificationStrategy: OFF
+        idleTerminationMinutes: "10"
+        initScript: |-
+          sudo apt-get update
+          sudo apt-get install default-jre -y
+        javaPath: "java"
+        labelString: ${SLAVE_LABEL}
+        maxTotalUses: -1
+        metadataEndpointEnabled: true
+        metadataHopsLimit: 1
+        metadataSupported: true
+        metadataTokensRequired: false
+        minimumNumberOfInstances: 0
+        minimumNumberOfSpareInstances: 0
+        mode: EXCLUSIVE
+        monitoring: false
+        numExecutors: ${numExecutors}
+        remoteAdmin: "${REMOTEADMIN}"
+        remoteFS: "${REMOTEPATH}"
+        securityGroups: "${SECURITYGROUP}"
+        stopOnTerminate: false
+        subnetId: "${SUBNETID}"
+        t2Unlimited: false
+        tenancy: Default
+        type: ${SLAVETYPE}
+        useEphemeralDevices: false
+        zone: "${ZONE}"
+      useInstanceProfileForCredentials: false
+
+jobs:
+- script: >
+    freeStyleJob('job-dsl-plugin') {
+      description('Initial job')
+      displayName('new job')
+      label('${SLAVE_LABEL}')
+      steps {
+              shell('echo "Hello, Jenkins!"')
+        }
+    }
