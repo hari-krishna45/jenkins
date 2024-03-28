@@ -54,4 +54,33 @@ Jenkins Configuration as Code (JCasC) is an effective method for automating the 
 6. **Environment Variables**: Certain configuration values were parameterized using environment variables, providing flexibility and allowing for customization based on deployment environments.
 
 ## Infrastrcture
+**Infrastructure Provisioning with Terraform in AWS**:
+
+Using Terraform scripts, we've orchestrated the deployment of the following resources in AWS, ensuring a robust and scalable infrastructure for our Jenkins setup:
+
+1. **ECR (Elastic Container Registry)**: A centralized repository to store Docker images, facilitating seamless deployment and management of containerized applications in AWS ECS.
+
+2. **IAM Role**: An execution role specifically tailored for ECS service and task, granting necessary permissions for accessing AWS resources securely.
+
+3. **Key Pair**: A key pair for private and public key authentication, enabling secure login into EC2 agents by the Jenkins controller.
+
+4. **Security Groups**: Configured to enforce security measures for ECS tasks and slaves (EC2 agents), ensuring controlled access and protecting against unauthorized network traffic. Optionally, security groups may also be utilized for load balancers.
+
+5. **CloudWatch Logs**: A log group in Amazon CloudWatch to store ECS task logs, facilitating monitoring, troubleshooting, and analysis of application logs.
+
+6. **EFS (Elastic File System)**: Utilized for data persistence, ensuring that data remains intact even in the event of task failure. This enhances reliability and ensures seamless recovery in case of failures.
+
+7. **IAM USER**: An IAM user is created to connect to AWS and manage the creation of new agents as EC2 instances. This user is granted appropriate permissions to interact with AWS services programmatically, facilitating the dynamic provisioning of EC2 instances as Jenkins agents.
+
+8. **ECS Cluster**: Instead of relying on the default cluster, we've created a dedicated ECS cluster specifically for Jenkins, providing isolation and better resource management.
+
+9. **ECS Service**: The Jenkins container runs within an ECS service, ensuring high availability, scalability, and automated management of container instances.
+
+10. **Alarms**: CloudWatch alarms configured to trigger alerts when CPU utilization reaches certain threshold values, enabling proactive monitoring and mitigation of performance issues.
+
+11. **Load Balancer (Optional)**: Optionally, a load balancer may be provisioned to distribute incoming traffic across ECS container instances, improving performance, availability, and fault tolerance.
+
+12. **Local Provisioners**: Used to build and push Docker images to ECR before ECS deployment, ensuring that the latest version of the image is available for deployment.
+
+**Notes and Instructions:**
 
