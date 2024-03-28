@@ -81,6 +81,38 @@ Using Terraform scripts, we've orchestrated the deployment of the following reso
 11. **Load Balancer (Optional)**: Optionally, a load balancer may be provisioned to distribute incoming traffic across ECS container instances, improving performance, availability, and fault tolerance.
 
 12. **Local Provisioners**: Used to build and push Docker images to ECR before ECS deployment, ensuring that the latest version of the image is available for deployment.
-
+    
 **Notes and Instructions:**
 
+When executing Terraform, ensure to provide the following mandatory variable values:
+
+- `vpc_id`: The ID of the Virtual Private Cloud (VPC) where the infrastructure will be deployed.
+- `subnets`: A list of public subnet IDs for ECS deployment. Example: `["subnet-1a", "subnet-1b"]`.
+- `slave_subnet_id`: The ID of the single public subnet where the EC2 agent will be created.
+
+All other variables have default values.
+
+**Notes:**
+
+If you intend to have the load balancer as the front-facing component with ECS and agent in a private network, modify the following values:
+
+- `enable_loadbalancer = true`
+- `subnets`: List of private subnet IDs for ECS.
+- `slave_subnet_id`: Private subnet ID for the EC2 agent.
+- `subnet_ids`: List of public subnet IDs for the load balancer.
+- `assign_public_ip = false`
+- Adjust other load balancer variables accordingly.
+
+We have enabled execution permissions for the ECS service task. If these permissions are not required, you can modify the enable_execute_command variable to false. This will disable the execution command feature for the ECS service task.
+
+**Potential Errors to Anticipate:**
+
+1. **AMI Region Specificity**: Ensure to update the AMI (Amazon Machine Image) according to the specific region where the infrastructure is being provisioned. This ensures compatibility and availability of the required AMI in the chosen region.
+
+2. **Initialization Script in JCasC**: The JCasC configuration includes an initialization script specifically tailored for Ubuntu, which installs Java on the agent before executing any job. Make sure this script is compatible with the target environment and addresses any platform-specific requirements.
+
+3. **Alarms Alert Configuration**: When setting up alarms for alerting, ensure to include your SNS (Simple Notification Service) topic as the value for the `sns` variable while executing Terraform. This enables alerts to be sent to the designated topic for timely notification of critical events.
+
+4. **Security Group Configuration**: The default security group for ECS tasks and load balancers may not have open ports for external connections. To enable external access, provide a list of IP addresses to include ingress rules in the security group. This ensures that external traffic is allowed through specified ports for communication with the ECS tasks and load balancers.
+
+5. **SSL Certificate ARN**: When configuring SSL verification, include a valid SSL certificate ARN (Amazon Resource Name) as the value. This ensures secure communication and verification of SSL/TLS certificates for encrypted connections.
