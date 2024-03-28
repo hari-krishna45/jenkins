@@ -116,3 +116,4 @@ We have enabled execution permissions for the ECS service task. If these permiss
 4. **Security Group Configuration**: The default security group for ECS tasks and load balancers may not have open ports for external connections. To enable external access, provide a list of IP addresses to include ingress rules in the security group. This ensures that external traffic is allowed through specified ports for communication with the ECS tasks and load balancers.
 
 5. **SSL Certificate ARN**: When configuring SSL verification, include a valid SSL certificate ARN (Amazon Resource Name) as the value. This ensures secure communication and verification of SSL/TLS certificates for encrypted connections.
+6. **Docker commands**: Docker installtion and docker commands requries sudo permissions. So please make sure of this permissions while running terraform.
